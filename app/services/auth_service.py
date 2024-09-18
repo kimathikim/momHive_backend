@@ -26,8 +26,7 @@ def register_user(data):
     if data.get("password"):
         data["password"] = hash_password(data["password"])
 
-    required_fields = ["first_name", "second_name",
-                       "email", "phone_number", "password"]
+    required_fields = ["first_name", "second_name", "email", "phone_number", "password"]
     for field in required_fields:
         if field not in data:
             return {"error": f"{field} is required"}
