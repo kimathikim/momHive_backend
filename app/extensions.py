@@ -50,5 +50,11 @@ def init_extensions(app):
     jwt.init_app(app)
     mail.init_app(app)
     cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
-    socketio.init_app(app, cors_allowed_origins="*")
+    socketio.init_app(
+        app,
+        ping_interval=25,
+        ping_timeout=120,
+        async_mode="eventlet",
+        cors_allowed_origins="*",
+    )
     swagger.init_app(app)

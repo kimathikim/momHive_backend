@@ -12,21 +12,19 @@ from app.services.kafka_producer import send_group_message, send_user_message
 @socketio.on("connect")
 def handle_connect():
     token = request.args.get("token")
-
     if token:
         try:
             user_data = decode_token(token)
             user_id = user_data["sub"]
             print(f"User {user_id} connected")
 
-            # Use Flask-SocketIO's start_background_task method to run the Redis task in the background
             socketio.start_background_task(
                 target=send_offline_messages, user_id=user_id
             )
 
-        except Exception:
-            print("Unauthorized WebSocket connection")
-            return False  # Reject the connection
+        except Exception as e:
+            print(f"Unauthorized WebSocket connection: {str(e)}")
+            return False
 
 
 def send_offline_messages(user_id):
