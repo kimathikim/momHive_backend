@@ -108,6 +108,7 @@ def ws_send_private_message(data):
             },
             room=room,
         )
+        print(f"messafe sent successfully to private room: {room}")
 
     except Exception as e:
         print(f"Error sending private message: {str(e)}")
