@@ -5,8 +5,8 @@ from app.models.base_model import Base, BaseClass
 
 class Conversations(Base, BaseClass):
     __tablename__ = "conversations"
-    user_1_id = Column(String(60), ForeignKey("users.id"), nullable=False)
-    user_2_id = Column(String(60), ForeignKey("users.id"), nullable=False)
+    sender = Column(String(60), ForeignKey("users.id"), nullable=False)
+    receiver = Column(String(60), ForeignKey("users.id"), nullable=False)
 
     messages = relationship("Messages", backref="conversation", lazy=True)
 

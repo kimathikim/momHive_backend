@@ -62,8 +62,28 @@ def send_private_message():
         )
         return jsonify({"message": "Message sent successfully"}), 201
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({"error": "Failed to send message"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+# get all the users who have received a message from the current user
+
+
+@messages_bp.route("/messages/contacts", methods=["GET"])
+@jwt_required()
+def get_mycont():
+    user_id = get_jwt_identity()
+    messages = storage.all(Messages)
+    messages = [
+        message.to_dict() for message in messages if message.sender_id == user_id
+    ]
+    recipients = []
+    if messages:
+        for message in messages:
+            recipient = storage.get(Users, message["recipient_id"])
+            if recipient:
+                recipients.append(recipient.to_dict())
+
+    return jsonify(recipients), 200
 
 
 @messages_bp.route("/messages/group", methods=["POST"])
