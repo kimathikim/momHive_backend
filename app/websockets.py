@@ -31,8 +31,7 @@ def handle_connect():
 
 def send_offline_messages(user_id):
     # Check for any offline messages in Redis
-    offline_messages = redis_client.lrange(
-        f"offline_messages:{user_id}", 0, -1)
+    offline_messages = redis_client.lrange(f"offline_messages:{user_id}", 0, -1)
 
     if offline_messages:
         for msg in offline_messages:
@@ -80,14 +79,12 @@ def join_group_room(data):
             join_room(room)
             print(f"User {user_id} joined group room {room}")
         else:
-            print(
-                f"Unauthorized attempt by {user_id} to join group {group_id}")
+            print(f"Unauthorized attempt by {user_id} to join group {group_id}")
 
     except Exception:
         print("Failed to join group room")
 
 
-# SEND PRIVATE MESSAGE THROUGH WEBSOCKET
 @socketio.on("send_private_message")
 def ws_send_private_message(data):
     token = data.get("token")
@@ -148,8 +145,7 @@ def ws_send_group_message(data):
             )
 
         else:
-            print(
-                f"Unauthorized message by user {sender_id} to group {group_id}")
+            print(f"Unauthorized message by user {sender_id} to group {group_id}")
 
     except Exception as e:
         print(f"Error sending group message: {str(e)}")

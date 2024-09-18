@@ -8,8 +8,6 @@ class Conversations(Base, BaseClass):
     sender = Column(String(60), ForeignKey("users.id"), nullable=False)
     receiver = Column(String(60), ForeignKey("users.id"), nullable=False)
 
-    messages = relationship("Messages", backref="conversation", lazy=True)
-
     def __init__(self, **kwargs):
         """initialize the class with relevant details."""
         super().__init__(**kwargs)

@@ -26,7 +26,7 @@ def send_user_message(sender_id, receiver_id, content):
     }
 
     producer.produce(
-        "private_messages", key=str(sender_id), value=json.dumps(message_data)
+        "messages_topic", key=str(sender_id), value=json.dumps(message_data)
     )
     producer.flush()
 

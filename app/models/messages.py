@@ -11,8 +11,6 @@ class Messages(Base, BaseClass):
     sender_id = Column(String(60), ForeignKey("users.id"), nullable=False)
     recipient_id = Column(String(60), ForeignKey("users.id"), nullable=False)
     content = Column(String(1024), nullable=False)
-    conversation_id = Column(String(60), ForeignKey(
-        "conversations.id"), nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
     read = Column(Boolean, default=False)
     sender = relationship(

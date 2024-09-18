@@ -25,36 +25,41 @@ def get_users():
 @jwt_required()
 @rate_limit(limit=10, per=60)  # 10 messages per minute
 def send_private_message():
-    user_id = get_jwt_identity()
+    sender_id = get_jwt_identity()
+    print(sender_id)
     data = request.json
 
     if not data or not all(k in data for k in ("receiver_id", "content")):
         return jsonify({"error": "Missing required fields"}), 400
 
-    receiver_id = data["receiver_id"]
+    recipient_id = data["receiver_id"]
     content = data["content"]
 
     try:
-        message = Messages(sender_id=user_id, receiver_id=receiver_id, content=content)
+        message = Messages(
+            sender_id=sender_id,
+            recipient_id=recipient_id,
+            content=content,
+        )
         message.save()
 
-        room = f"private_{min(user_id, receiver_id)}_{max(user_id, receiver_id)}"
+        room = f"private_{min(sender_id, recipient_id)}_{max(sender_id, recipient_id)}"
         redis_client.rpush(
-            f"offline_messages:{receiver_id}",
+            f"offline_messages:{recipient_id}",
             json.dumps(
                 {
-                    "sender_id": user_id,
+                    "sender_id": sender_id,
                     "content": content,
                     "timestamp": message.timestamp.isoformat(),
                 }
             ),
         )
 
-        send_user_message(user_id, receiver_id, content)
+        send_user_message(sender_id, recipient_id, content)
         socketio.emit(
             "receive_private_message",
             {
-                "sender_id": user_id,
+                "sender_id": sender_id,
                 "content": content,
                 "timestamp": message.timestamp.isoformat(),
             },
