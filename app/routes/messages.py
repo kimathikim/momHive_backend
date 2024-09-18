@@ -62,6 +62,9 @@ def send_private_message():
         )
         return jsonify({"message": "Message sent successfully"}), 201
     except Exception as e:
+        import traceback
+
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 
