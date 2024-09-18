@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.routes import messages_bp
 from app.models.messages import Messages
 from app.models.groups import Groups
+from app.models.user import Users
 from app.extensions import socketio, redis_client
 from app.services.kafka_producer import send_user_message, send_group_message
 from app.services.rate_limiter import rate_limit
@@ -15,7 +16,7 @@ from app.models import storage
 @jwt_required()
 def get_users():
     user_id = get_jwt_identity()
-    users = storage.all("Users")
+    users = storage.all(Users)
     users = [user.to_dict() for user in users if user.id != user_id]
     return jsonify(users), 200
 
