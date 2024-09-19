@@ -18,23 +18,20 @@ def handle_connect():
             user_id = user_data["sub"]
             print(f"User {user_id} connected")
 
-            socketio.start_background_task(
-                target=send_offline_messages, user_id=user_id
-            )
-
         except Exception as e:
             print(f"Unauthorized WebSocket connection: {str(e)}")
             return False
 
 
-def send_offline_messages(user_id):
-    # Check for any offline messages in Redis
+def send_offline_messages(user_id, room):
     offline_messages = redis_client.lrange(
         f"offline_messages:{user_id}", 0, -1)
+    print(offline_messages)
 
     if offline_messages:
         for msg in offline_messages:
-            emit("receive_private_message", json.loads(msg))
+            socketio.emit("receive_private_message",
+                          json.loads(msg), room=room)
         redis_client.delete(f"offline_messages:{user_id}")
 
 
@@ -55,6 +52,9 @@ def join_private_room(data):
 
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
         join_room(room)
+        # emmit messages from redis
+        send_offline_messages(sender_id, room)
+
         print(f"User {sender_id} joined private room {room}")
 
     except Exception:
