@@ -69,7 +69,7 @@ def send_private_message():
         redis_client.rpush(
             f"offline_messages:{recipient_id}",
             json.dumps(
-                message_data,
+                message,
             ),
         )
         return jsonify({"message": "Message sent successfully"}), 201
