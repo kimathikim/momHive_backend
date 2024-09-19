@@ -107,12 +107,12 @@ def ws_send_private_message(data):
         )
         message.save()
 
-        sanitize_object(message)
+        message = message.to_dict()
         if message["timestamp"]:
             message["timestamp"] = format_datetime(message["timestamp"])
         socketio.emit(
             "receive_private_message",
-            message.to_dict(),
+            message,
             room=room,
         )
         print(f"messafe sent successfully to private room: {room}")
