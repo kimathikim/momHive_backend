@@ -2,6 +2,7 @@ import datetime
 import json
 from app.models.messages import Messages
 from flask import request
+from app.utils.sanitization import sanitize_object
 from flask_jwt_extended import decode_token
 from flask_socketio import emit, join_room
 from app.utils.date_time import format_datetime
@@ -32,10 +33,10 @@ def send_offline_messages(user_id, room):
 
     if offline_messages:
         for msg in offline_messages:
+            msg = json.loads(msg)
             if msg["timestamp"]:
                 msg["timestamp"] = format_datetime(msg["timestamp"])
-            socketio.emit("receive_private_message",
-                          json.loads(msg), room=room)
+            socketio.emit("receive_private_message", msg, room=room)
 
 
 @socketio.on("disconnect")
@@ -140,11 +141,11 @@ def ws_send_group_message(data):
         group = storage.get(Groups, group_id)
         if group and sender_id in [member.id for member in group.members]:
             room = f"group_{group_id}"
-
-            # Send to Kafka for processing
-            send_group_message(sender_id, group_id, content)
-
-            # Emit message to WebSocket room
+            #
+            # # Send to Kafka for processing
+            # send_group_message(sender_id, group_id, content)
+            #
+            # # Emit message to WebSocket room
             socketio.emit(
                 "receive_group_message",
                 {
