@@ -106,6 +106,8 @@ def ws_send_private_message(data):
             content=content,
         )
         message.save()
+
+        sanitize_object(message)
         if message["timestamp"]:
             message["timestamp"] = format_datetime(message["timestamp"])
         socketio.emit(
@@ -118,9 +120,7 @@ def ws_send_private_message(data):
 
         # Add the message to Redis
         redis_client.rpush(
-            f"offline_messages:{receiver_id}", json.dumps(
-                sanitize_object(message))
-        )
+            f"offline_messages:{receiver_id}", json.dumps(message))
 
     except Exception as e:
         print(f"Error sending private message: {str(e)}")
