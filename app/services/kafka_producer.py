@@ -1,5 +1,6 @@
 from confluent_kafka import Producer
 import json
+from app.extensions import socketio
 from datetime import datetime
 import os
 from dotenv import load_dotenv
@@ -17,7 +18,7 @@ conf = {
 producer = Producer(conf)
 
 
-def send_user_message(sender_id, receiver_id, content):
+def send_user_message(sender_id, receiver_id, content, room):
     message_data = {
         "sender_id": sender_id,
         "receiver_id": receiver_id,
@@ -29,6 +30,16 @@ def send_user_message(sender_id, receiver_id, content):
         "messages_topic", key=str(sender_id), value=json.dumps(message_data)
     )
     producer.flush()
+    socketio.emit(
+        "receive_private_message",
+        {
+            "sender_id": sender_id,
+            "content": content,
+            "timestamp": datetime.now().isoformat(),
+        },
+        room=room,
+    )
+    print(f"messafe sent successfully from kafka producer: {room}")
 
 
 def send_group_message(sender_id, group_id, content):
