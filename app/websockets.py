@@ -105,7 +105,6 @@ def ws_send_private_message(data):
 
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
 
-        # Emit message to WebSocket room
         message = Messages(
             sender_id=sender_id,
             recipient_id=receiver_id,

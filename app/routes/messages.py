@@ -1,4 +1,5 @@
 import datetime
+from app.utils.date_time import format_datetime
 import json
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -41,7 +42,7 @@ def get_private_messages(recipient_id):
 
 @messages_bp.route("/messages/private", methods=["POST"])
 @jwt_required()
-@rate_limit(limit=10, per=60)  # 10 messages per minute
+@rate_limit(limit=10, per=60)
 def send_private_message():
     sender_id = get_jwt_identity()
     print(sender_id)
@@ -60,9 +61,10 @@ def send_private_message():
             content=content,
         )
         message.save()
-        message_data = message.to_dict()
-        if message_data["timestamp"]:
-            message_data["timestamp"] = message_data["timestamp"].isoformat()
+
+        message = message.to_dict()
+        if message["timestamp"]:
+            message["timestamp"] = format_datetime(message["timestamp"])
 
         redis_client.rpush(
             f"offline_messages:{recipient_id}",
