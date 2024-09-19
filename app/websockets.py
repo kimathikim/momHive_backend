@@ -4,6 +4,7 @@ from app.models.messages import Messages
 from flask import request
 from flask_jwt_extended import decode_token
 from flask_socketio import emit, join_room
+from app.utils.date_time import format_datetime
 from app.extensions import redis_client, socketio
 from app.models import storage
 from app.models.groups import Groups
@@ -31,6 +32,8 @@ def send_offline_messages(user_id, room):
 
     if offline_messages:
         for msg in offline_messages:
+            if msg["timestamp"]:
+                msg["timestamp"] = format_datetime(msg["timestamp"])
             socketio.emit("receive_private_message",
                           json.loads(msg), room=room)
 
@@ -104,7 +107,8 @@ def ws_send_private_message(data):
             content=content,
         )
         message.save()
-
+        if message["timestamp"]:
+            message["timestamp"] = format_datetime(message["timestamp"])
         socketio.emit(
             "receive_private_message",
             message.to_dict(),
