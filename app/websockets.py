@@ -55,7 +55,7 @@ def join_private_room(data):
 
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
         join_room(room)
-        # send_offline_messages(sender_id, room)
+        send_offline_messages(sender_id, room)
 
         print(f"User {sender_id} joined private room {room}")
 
@@ -115,7 +115,7 @@ def ws_send_private_message(data):
             message,
             room=room,
         )
-        print(f"messafe sent successfully to private room: {room}")
+        print(f"message sent successfully to private room: {room}")
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
 
         # Add the message to Redis

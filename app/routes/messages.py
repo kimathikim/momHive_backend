@@ -64,9 +64,6 @@ def send_private_message():
         if message_data["timestamp"]:
             message_data["timestamp"] = message_data["timestamp"].isoformat()
 
-        room = f"private_{min(sender_id, recipient_id)}_{max(sender_id, recipient_id)}"
-
-        # Add the message to Redis
         redis_client.rpush(
             f"offline_messages:{recipient_id}",
             json.dumps(
@@ -76,9 +73,6 @@ def send_private_message():
         return jsonify({"message": "Message sent successfully"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
-# get all the users who have received a message from the current user
 
 
 @messages_bp.route("/messages/contacts", methods=["GET"])
