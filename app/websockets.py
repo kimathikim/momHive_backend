@@ -32,10 +32,13 @@ def send_offline_messages(user_id, room):
 
     if offline_messages:
         for msg in offline_messages:
-            msg = json.loads(msg)
-            if msg["timestamp"]:
-                msg["timestamp"] = format_datetime(msg["timestamp"])
-            socketio.emit("receive_private_message", msg, room=room)
+            try:
+                msg = json.loads(msg)
+                if msg["timestamp"]:
+                    msg["timestamp"] = format_datetime(msg["timestamp"])
+                socketio.emit("receive_private_message", msg, room=room)
+            except TypeError as e:
+                print(f"Error converting message to JSON: {str(e)}")
 
 
 @socketio.on("disconnect")
