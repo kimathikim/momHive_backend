@@ -1,5 +1,6 @@
 import datetime
 import json
+from app.models.messages import Messages
 from flask import request
 from flask_jwt_extended import decode_token
 from flask_socketio import emit, join_room
@@ -96,20 +97,26 @@ def ws_send_private_message(data):
 
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
 
-        # Send to Kafka for processing
-        send_user_message(sender_id, receiver_id, content, room)
-
         # Emit message to WebSocket room
+        message = Messages(
+            sender_id=sender_id,
+            recipient_id=receiver_id,
+            content=content,
+        )
+        message.save()
+
         socketio.emit(
             "receive_private_message",
-            {
-                "sender_id": sender_id,
-                "content": content,
-                "timestamp": datetime.datetime.now().isoformat(),
-            },
+            message.to_dict(),
             room=room,
         )
         print(f"messafe sent successfully to private room: {room}")
+        room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
+
+        # Add the message to Redis
+        redis_client.rpush(
+            f"offline_messages:{receiver_id}", json.dumps(message.to_dict())
+        )
 
     except Exception as e:
         print(f"Error sending private message: {str(e)}")

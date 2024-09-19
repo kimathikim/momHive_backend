@@ -61,29 +61,9 @@ def send_private_message():
         )
         message.save()
 
-        room = f"private_{min(sender_id, recipient_id)}_{max(sender_id, recipient_id)}"
-
-        # Add the message to Redis
         redis_client.rpush(
             f"offline_messages:{recipient_id}",
-            json.dumps(
-                {
-                    "sender_id": sender_id,
-                    "content": content,
-                    "timestamp": message.timestamp.isoformat(),
-                }
-            ),
-        )
-
-        send_user_message(sender_id, recipient_id, content, room)
-        socketio.emit(
-            "receive_private_message",
-            {
-                "sender_id": sender_id,
-                "content": content,
-                "timestamp": message.timestamp.isoformat(),
-            },
-            room=room,
+            json.dumps(message.to_dict()),
         )
         return jsonify({"message": "Message sent successfully"}), 201
     except Exception as e:
