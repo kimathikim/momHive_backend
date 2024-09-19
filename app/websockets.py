@@ -29,6 +29,8 @@ def handle_connect():
 def send_offline_messages(user_id, room):
     offline_messages = redis_client.lrange(
         f"offline_messages:{user_id}", 0, -1)
+    print(f"offline messages: {offline_messages}")
+    del redis_client[f"offline_messages:{user_id}"]
 
     if offline_messages:
         for msg in offline_messages:
