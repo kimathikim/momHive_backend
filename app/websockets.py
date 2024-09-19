@@ -39,6 +39,7 @@ def send_offline_messages(user_id, room):
                 socketio.emit("receive_private_message", msg, room=room)
             except TypeError as e:
                 print(f"Error converting message to JSON: {str(e)}")
+    redis_client.delete(f"offline_messages:{user_id}")
 
 
 @socketio.on("disconnect")
