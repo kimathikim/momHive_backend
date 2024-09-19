@@ -29,7 +29,6 @@ def handle_connect():
 def send_offline_messages(user_id, room):
     offline_messages = redis_client.lrange(
         f"offline_messages:{user_id}", 0, -1)
-    print(offline_messages)
 
     if offline_messages:
         for msg in offline_messages:
@@ -56,8 +55,7 @@ def join_private_room(data):
 
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
         join_room(room)
-        # emmit messages from redis
-        send_offline_messages(sender_id, room)
+        # send_offline_messages(sender_id, room)
 
         print(f"User {sender_id} joined private room {room}")
 
