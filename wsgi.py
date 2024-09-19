@@ -10,7 +10,7 @@ app = create_app()
 
 if __name__ != "__main__":
     application = app
-
+# initialize the app context. this is in case the server can support multithreadding
 with app.app_context():
     load_dotenv()
     conf = {

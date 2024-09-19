@@ -21,6 +21,24 @@ def get_users():
     return jsonify(users), 200
 
 
+@messages_bp.route("/messages/private/<recipient_id>", methods=["GET"])
+@jwt_required()
+def get_private_messages(recipient_id):
+    user_id = get_jwt_identity()
+
+    messages = storage.all(Messages)
+
+    messages = [
+        message.to_dict()
+        for message in messages
+        if message.sender_id in [user_id, recipient_id]
+        and message.recipient_id in [user_id, recipient_id]
+    ]
+    # Sort the messages by timestamp
+    messages.sort(key=lambda x: x["timestamp"])
+    return jsonify(messages), 200
+
+
 @messages_bp.route("/messages/private", methods=["POST"])
 @jwt_required()
 @rate_limit(limit=10, per=60)  # 10 messages per minute
