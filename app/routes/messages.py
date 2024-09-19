@@ -44,6 +44,8 @@ def send_private_message():
         message.save()
 
         room = f"private_{min(sender_id, recipient_id)}_{max(sender_id, recipient_id)}"
+
+        # Add the message to Redis
         redis_client.rpush(
             f"offline_messages:{recipient_id}",
             json.dumps(

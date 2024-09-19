@@ -1,9 +1,6 @@
 import os
 from confluent_kafka import Consumer, KafkaError
-from confluent_kafka import Consumer, KafkaError, KafkaException
-from flask_socketio import emit, join_room
 from app.extensions import socketio
-import threading
 import json
 from dotenv import load_dotenv
 
@@ -30,6 +27,7 @@ def consume_messages():
 
     while True:
         msg = consumer.poll(timeout=1.0)
+        print(msg)
 
         if msg is None:
             continue  # No message retrieved
@@ -44,8 +42,9 @@ def consume_messages():
             # Process the message
             message = json.loads(msg.value().decode("utf-8"))
 
-            if msg.topic() == "private_messages":
+            if msg.topic() == PRIVATE_MESSAGES_TOPIC:
                 room = f"private_{min(message['sender_id'], message['receiver_id'])}_{max(message['sender_id'], message['receiver_id'])}"
+                print(f"Received private message: {message}")
                 socketio.emit(
                     "receive_private_message",
                     {
@@ -72,9 +71,13 @@ def consume_messages():
             print(f"Error processing Kafka message: {str(e)}")
 
 
-# Make sure to run the consumer in a background thread or separate process
-def start_kafka():
+if __name__ == "__main__":
     print("Starting Kafka consumers")
-    consumer_thread = threading.Thread(target=consume_messages)
-    consumer_thread.daemon = True
-    consumer_thread.start()
+    consume_messages()
+#
+# # Make sure to run the consumer in a background thread or separate process
+# def start_kafka():
+#     print("Starting Kafka consumers")
+#     consumer_thread = threading.Thread(target=consume_messages)
+#     consumer_thread.daemon = True
+#     consumer_thread.start()
