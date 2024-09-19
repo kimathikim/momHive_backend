@@ -118,7 +118,8 @@ def ws_send_private_message(data):
 
         # Add the message to Redis
         redis_client.rpush(
-            f"offline_messages:{receiver_id}", json.dumps(message.to_dict())
+            f"offline_messages:{receiver_id}", json.dumps(
+                sanitize_object(message))
         )
 
     except Exception as e:
