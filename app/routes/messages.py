@@ -55,7 +55,7 @@ def send_private_message():
             ),
         )
 
-        send_user_message(sender_id, recipient_id, content)
+        send_user_message(sender_id, recipient_id, content, room)
         socketio.emit(
             "receive_private_message",
             {

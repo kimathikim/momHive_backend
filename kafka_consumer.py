@@ -45,7 +45,6 @@ def consume_messages():
             message = json.loads(msg.value().decode("utf-8"))
 
             if msg.topic() == "private_messages":
-                # Emit the private message to WebSocket room
                 room = f"private_{min(message['sender_id'], message['receiver_id'])}_{max(message['sender_id'], message['receiver_id'])}"
                 socketio.emit(
                     "receive_private_message",
@@ -57,7 +56,6 @@ def consume_messages():
                     room=room,
                 )
             elif msg.topic() == "group_messages":
-                # Emit the group message to WebSocket room
                 room = f"group_{message['group_id']}"
                 socketio.emit(
                     "receive_group_message",
@@ -69,9 +67,7 @@ def consume_messages():
                     room=room,
                 )
 
-            # Commit the message offset
             consumer.commit()
-
         except Exception as e:
             print(f"Error processing Kafka message: {str(e)}")
 
