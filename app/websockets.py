@@ -32,7 +32,6 @@ def send_offline_messages(user_id, room):
         for msg in offline_messages:
             socketio.emit("receive_private_message",
                           json.loads(msg), room=room)
-        redis_client.delete(f"offline_messages:{user_id}")
 
 
 @socketio.on("disconnect")
