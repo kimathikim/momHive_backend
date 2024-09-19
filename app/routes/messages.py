@@ -60,6 +60,9 @@ def send_private_message():
             content=content,
         )
         message.save()
+        message_data = message.to_dict()
+        if message_data["timestamp"]:
+            message_data["timestamp"] = message_data["timestamp"].isoformat()
 
         room = f"private_{min(sender_id, recipient_id)}_{max(sender_id, recipient_id)}"
 
@@ -67,11 +70,7 @@ def send_private_message():
         redis_client.rpush(
             f"offline_messages:{recipient_id}",
             json.dumps(
-                {
-                    "sender_id": sender_id,
-                    "content": content,
-                    "timestamp": message.timestamp.isoformat(),
-                }
+                message_data,
             ),
         )
         return jsonify({"message": "Message sent successfully"}), 201
