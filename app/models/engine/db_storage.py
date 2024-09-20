@@ -10,6 +10,7 @@ from app.models.user import Users
 from app.models.groupMemebers import GroupMembers
 from app.models.conversation import Conversations
 from app.models.groups import Groups
+from app.models.articles import Article
 from app.models.events import Events
 from app.models.groupMessages import GroupMessages
 import pymysql
@@ -45,6 +46,7 @@ class DBStorage:
             GroupMembers,
             GroupMessages,
             Groups,
+            Article,
             Mentorship,
             MenteeSessions,
             Events,

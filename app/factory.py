@@ -7,6 +7,7 @@ from app.routes.auth import *
 from app.routes.groups import *
 from app.routes.messages import *
 from app.websockets import *
+from app.routes.articles import *
 
 storage.reload()
 

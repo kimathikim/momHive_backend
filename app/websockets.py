@@ -30,7 +30,6 @@ def send_offline_messages(user_id, room):
     offline_messages = redis_client.lrange(
         f"offline_messages:{user_id}", 0, -1)
     print(f"offline messages: {offline_messages}")
-    del redis_client[f"offline_messages:{user_id}"]
 
     if offline_messages:
         for msg in offline_messages:
@@ -102,7 +101,6 @@ def ws_send_private_message(data):
     try:
         user_data = decode_token(token)
         sender_id = user_data["sub"]
-
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
 
         message = Messages(
