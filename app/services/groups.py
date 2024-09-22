@@ -1,9 +1,9 @@
-from flask.helpers import get_root_path
 from app.models.groups import Groups
 from app.models import storage
 from app.models.groupMemebers import GroupMembers
 from app.models.groupMessages import GroupMessages
 from flask import jsonify
+from app.utils.sanitization import sanitize_object
 
 
 def create_group(data):
@@ -26,17 +26,18 @@ def create_group(data):
 
 def list_groups(query_params):
     groupsList = []
+    groupDict = {}
     if query_params.get("search"):
         groups = storage.search(Groups, query_params["search"])
     else:
-        groups = storage.all("Group")
-    if groups is None:
-        return {"error": "No groups found"}, 404
-    for group in groups:
-        groupDict = group.to_dict()
-        print(groupDict)
-        if group.members:
-            groupDict["members"] = group.members.to_dict()
+        groups = storage.all(Groups)
+        print(groups)
+        if groups is None:
+            return {"error": "No groups found"}, 404
+        for group in groups:
+            groupDict = group.to_dict()
+            groupDict["members"] = len([member for member in group.members])
+            print(groupDict)
         groupsList.append(groupDict)
     return jsonify(groupsList), 200
 
