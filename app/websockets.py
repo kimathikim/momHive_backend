@@ -141,7 +141,7 @@ def ws_send_group_message(data):
         sender_id = user_data["sub"]
 
         group = storage.get(Groups, group_id)
-        if group and sender_id in [member.id for member in group.members]:
+        if group and sender_id in [member.user_id for member in group.members]:
             room = f"group_{group_id}"
             #
             # # Send to Kafka for processing
