@@ -36,8 +36,8 @@ def list_groups(query_params):
             return {"error": "No groups found"}, 404
         for group in groups:
             groupDict = group.to_dict()
-            groupDict["members"] = [member.to_dict()
-                                    for member in group.members]
+            groupDict["members"] = len([member.to_dict()
+                                       for member in group.members])
             print(groupDict)
             groupsList.append(groupDict)
     return jsonify(groupsList), 200
@@ -47,15 +47,16 @@ def my_groups(user_id):
     groupsList = []
     groupDict = {}
     groups = storage.all(Groups)
-    print(groups)
     if groups is None:
         return {"error": "No groups found"}, 404
     for group in groups:
         groupDict = group.to_dict()
         groupDict["members"] = [member.to_dict() for member in group.members]
-        print(groupDict)
 
         for member in groupDict["members"]:
+            groupDict["members"] = len([member.to_dict()
+                                       for member in group.members])
+
             if member["user_id"] == user_id:
                 groupsList.append(groupDict)
     return jsonify(groupsList), 200
