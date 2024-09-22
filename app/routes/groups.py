@@ -8,6 +8,7 @@ from app.services.groups import (
     leave_group,
     send_group_message,
     get_group_messages,
+    my_groups,
     add_group_members,
 )
 from app.routes import group_bp
@@ -35,6 +36,13 @@ def create_new_group():
 def get_all_groups():
     query_params = request.args
     return list_groups(query_params)
+
+
+@group_bp.route("/mygroups", methods=["GET"])
+@jwt_required()
+def get_my_groups():
+    user_id = get_jwt_identity()
+    return my_groups(user_id)
 
 
 @group_bp.route("/groups/<group_id>", methods=["GET"])
