@@ -73,6 +73,11 @@ def join_group(group_id, user_id):
     group = storage.get(Groups, group_id)
     if not group:
         return {"error": "Group not found"}, 404
+
+    existing_member = storage.all(GroupMembers)
+    for member in existing_member:
+        if member.group_id == group_id and member.user_id == user_id:
+            return {"error": "User is already a member of this group"}, 400
     member = GroupMembers(group_id=group_id, user_id=user_id)
     member.save()
     return {"message": "Successfully joined the group"}
