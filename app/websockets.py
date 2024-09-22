@@ -80,7 +80,7 @@ def join_group_room(data):
 
         # Ensure the user is part of the group
         group = storage.get(Groups, group_id)
-        if group and user_id in [member.id for member in group.members]:
+        if group and user_id in [member.user_id for member in group.members]:
             room = f"group_{group_id}"
             join_room(room)
             print(f"User {user_id} joined group room {room}")
