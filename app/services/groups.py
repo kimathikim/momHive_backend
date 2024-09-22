@@ -1,3 +1,4 @@
+from flask.helpers import get_root_path
 from app.models.groups import Groups as Group
 from app.models import storage
 from app.models.groupMemebers import GroupMembers
@@ -26,11 +27,17 @@ def create_group(data):
 
 
 def list_groups(query_params):
+    groupsList = []
     if query_params.get("search"):
         groups = storage.search(Group, query_params["search"])
     else:
         groups = storage.all("Group")
-    return jsonify(groups)
+    if groups is None:
+        return {"error": "No groups found"}, 404
+    for group in groups:
+        groupsList.append(group.to_dict())
+
+    return jsonify(groupsList), 200
 
 
 def get_group_details(group_id):
