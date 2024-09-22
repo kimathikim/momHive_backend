@@ -34,6 +34,7 @@ def list_groups(query_params):
         return {"error": "No groups found"}, 404
     for group in groups:
         groupDict = group.to_dict()
+        print(groupDict)
         if group.members:
             groupDict["members"] = group.members.to_dict()
         groupsList.append(groupDict)
