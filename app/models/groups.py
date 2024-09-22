@@ -14,5 +14,4 @@ class Groups(Base, BaseClass):
     group_messages = relationship("GroupMessages", backref="groups", lazy=True)
 
     def __init__(self, **kwargs):
-        """initialize the class with relevant details."""
         super().__init__(**kwargs)
