@@ -1,33 +1,103 @@
+# app/services/mentoring.py
+
 from app.models.mentorship import Mentorship
-from flask import jsonify
+from app.models.user import Users
 from app.models import storage
-from datetime import datetime
 
 
 def request_mentorship(data):
-    mentor_id = data.get("mentor_id")
+    """
+    Request a mentorship session by a mentee with a mentor.
+    """
     mentee_id = data.get("mentee_id")
-    topic = data.get("topic")
-    status = data.get("status", "pending")
-    start_date = data.get("start_date", datetime.utcnow())
-    end_date = data.get("end_date")
-
-    if not mentor_id or not mentee_id or not topic:
-        return {"error": "Missing required fields"}
-
-    mentorship_request = Mentorship(
-        mentor_id=mentor_id,
-        mentee_id=mentee_id,
-        topic=topic,
-        status=status,
-        start_date=start_date,
-        end_date=end_date,
-    )
-    mentorship_request.save()
-
-    return {"message": "Mentorship request sent successfully"}
+    mentor_id = data.get("mentor_id")
+    mentor = storage.get(Users, mentor_id)
+    mentee = storage.get(Users, mentee_id)
+    if not mentee:
+        return {"msg": "Mentee not found"}, 404
+    if not mentee or not mentor:
+        return {"msg": "Invalid mentor or mentee."}, 400
+    if mentee.is_mentor or mentee.is_mentee is False:
+        return {"msg": "Invalid mentee or mentor"}, 400
+    new_mentorship = Mentorship(mentee_id=mentee_id, mentor_id=mentor_id)
+    new_mentorship.save()
+    return {"msg": "Mentorship request successful"}, 201
 
 
 def get_mentorships(user_id):
-    mentorships = storage.get(Mentorship, id=user_id)
-    return jsonify(mentorships)
+    """
+    Get all mentorship sessions for a user (both as mentor and mentee).
+    """
+    user = storage.get(Users, user_id)
+    if not user:
+        return {"msg": "User not found"}, 404
+
+    # Fetch sessions where the user is a mentor
+    sessions = storage.all(Mentorship)
+    mentor_sessions = [session for session in sessions if session.mentor_id == user_id]
+    mentee_sessions = [session for session in sessions if session.mentee_id == user_id]
+    # Prepare response
+    return {
+        "mentor_sessions": [
+            {"mentee_id": session.mentee_id, "session_date": session.session_date}
+            for session in mentor_sessions
+        ],
+        "mentee_sessions": [
+            {"mentor_id": session.mentor_id, "session_date": session.session_date}
+            for session in mentee_sessions
+        ],
+    }, 200
+
+
+def get_available_mentors(user_id):
+    """
+    Fetch all available mentors (excluding the current user).
+    """
+    users = storage.all(Users)
+    mentors = [mentor for mentor in users if mentor.is_mentor == True]
+
+    return [
+        {
+            "id": mentor.id,
+            "name": f"{mentor.first_name} {mentor.second_name}",
+            "expertise": mentor.expertise,
+        }
+        for mentor in mentors
+    ]
+
+
+def get_my_mentees(mentor_id):
+    """
+    Fetch all mentees assigned to the logged-in mentor.
+    """
+    users = storage.all(Users)
+    mentees = [mentee for mentee in users if mentee.is_mentee == True]
+
+    return [
+        {
+            "id": mentee.mentee_id,
+            "name": f"{mentee.mentee.first_name} {mentee.mentee.second_name}",
+            "needs_help_with": mentee.mentee.help_needed,
+        }
+        for mentee in mentees
+    ]
+
+
+def get_profile(user_id):
+    """
+    Get detailed profile information for a mentor or mentee.
+    """
+    user = storage.get(Users, user_id)
+
+    if not user:
+        return None
+
+    return {
+        "id": user.id,
+        "first_name": user.first_name,
+        "second_name": user.second_name,
+        "email": user.email,
+        "phone_number": user.phone_number,
+        "expertise": user.expertise if user.is_mentor else None,
+        "help_needed": user.help_needed if user.is_mentee else None,
+    }

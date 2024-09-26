@@ -9,6 +9,7 @@ from app.routes.messages import *
 from app.websockets import *
 from app.routes.articles import *
 from app.routes.events import *
+from app.routes.mentoring import *
 
 storage.reload()
 
