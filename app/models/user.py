@@ -13,11 +13,9 @@ class Users(Base, BaseClass):
     password = Column(String(128), nullable=False)
 
     is_mentor = Column(Boolean, default=False)
-    expertise = Column(Text, nullable=True)  # Mentor's area of expertise
-
-    is_mentee = Column(Boolean, default=True)
-    help_needed = Column(Text, nullable=True)  # Areas where mentee needs help
-
+    expertise = Column(Text, nullable=True)
+    is_mentee = Column(Boolean, default=False)
+    help_needed = Column(Text, nullable=True)
     mentor_sessions = relationship(
         "Mentorship",
         back_populates="mentor",

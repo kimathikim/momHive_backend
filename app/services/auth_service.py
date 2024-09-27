@@ -56,3 +56,14 @@ def login_user(data):
         return jsonify({"error": "Email and password required"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+def update_user_profile(data):
+    try:
+        user = storage.get_by_email(Users, data["email"])
+        if user:
+            user.update(data)
+            return jsonify({"success": user.to_dict()}), 202
+        return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -1,6 +1,6 @@
 from flask import request
 from app.routes import auth_bp
-from app.services.auth_service import login_user, register_user
+from app.services.auth_service import login_user, register_user, update_user_profile
 from flasgger import swag_from
 from dotenv import load_dotenv
 
@@ -81,3 +81,9 @@ def login():
     data = request.get_json()
     result = login_user(data)
     return result
+
+
+@auth_bp.route("/update_profile", methods=["PUT"])
+def update_profile():
+    data = request.get_json()
+    return update_user_profile(data)
