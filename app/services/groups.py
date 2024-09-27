@@ -127,7 +127,7 @@ def update_user_profile(data, user_id):
     try:
         user = storage.get(Users, user_id)
         if user:
-            user.update(data)
+            storage.update(user, data)
             return jsonify({"success": user.to_dict()}), 202
         return jsonify({"error": "User not found"}), 404
     except Exception as e:

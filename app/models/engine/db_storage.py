@@ -84,8 +84,7 @@ class DBStorage:
         from app.models.base_model import Base
 
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(
-            bind=self.__engine, expire_on_commit=False)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
 
@@ -120,14 +119,6 @@ class DBStorage:
         """get an object from the database"""
         if cls is not None and code is not None:
             obj = self.__session.query(cls).filter_by(otp_code=code).first()
-            return obj
-        return None
-
-    def get_patient_code(self, cls, code):
-        """get an object from the database"""
-        if cls is not None and code is not None:
-            obj = self.__session.query(cls).filter_by(
-                patient_code=code).first()
             return obj
         return None
 
