@@ -24,8 +24,8 @@ swagger = Swagger(
     template={
         "swagger": "2.0",
         "info": {
-            "title": "HOSPITAL PRESCRIPTION MANAGEMENT SYSTEM API",
-            "description": "API for my data",
+            "title": "MOMHIVE API",
+            "description": "API for my momhive application",
             "contact": {
                 "responsibleOrganization": "Vandi.tech",
                 "responsibleDeveloper": "Brian Kimathi",
