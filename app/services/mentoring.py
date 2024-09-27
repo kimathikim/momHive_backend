@@ -77,7 +77,7 @@ def get_my_mentees(mentor_id):
         {
             "id": mentee.id,
             "name": f"{mentee.first_name} {mentee.second_name}",
-            "needs_help_with": mentee.help_needed,
+            "help_needed": mentee.help_needed,
         }
         for mentee in mentees
     ]
