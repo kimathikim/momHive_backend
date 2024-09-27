@@ -94,5 +94,6 @@ def update_profile():
 
 @group_bp.route("/profile", methods=["GET"])
 @jwt_required()
-def get_profile(user_id):
+def get_profile():
+    user_id = get_jwt_identity()
     return get_user_profile(user_id)
