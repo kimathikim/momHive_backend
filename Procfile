@@ -1,1 +1,1 @@
-web: gunicorn --timeout 120 -k eventlet -w 1 wsgi:application
+web: gunicorn --timeout 20 -k eventlet   -w 1 --workers 3 wsgi:application
