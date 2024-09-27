@@ -54,7 +54,7 @@ def get_available_mentors(user_id):
     Fetch all available mentors (excluding the current user).
     """
     users = storage.all(Users)
-    mentors = [mentor for mentor in users if mentor.is_mentor == True]
+    mentors = [mentor for mentor in users if mentor.is_mentor is True]
 
     return [
         {
@@ -71,7 +71,7 @@ def get_my_mentees(mentor_id):
     Fetch all mentees assigned to the logged-in mentor.
     """
     users = storage.all(Users)
-    mentees = [mentee for mentee in users if mentee.is_mentee == True]
+    mentees = [mentee for mentee in users if mentee.is_mentee is True]
 
     return [
         {

@@ -46,7 +46,7 @@ def get_mentees():
     return jsonify(mentees), 200
 
 
-@mentor_bp.route("/profile/<int:user_id>", methods=["GET"])
+@mentor_bp.route("/profile/<user_id>", methods=["GET"])
 @jwt_required()
 def view_profile(user_id):
     profile = get_profile(user_id)
