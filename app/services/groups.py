@@ -125,7 +125,7 @@ def get_user_profile(user_id):
 
 def update_user_profile(data, user_id):
     try:
-        user = storage.get_by_email(Users, user_id)
+        user = storage.get(Users, user_id)
         if user:
             user.update(data)
             return jsonify({"success": user.to_dict()}), 202
