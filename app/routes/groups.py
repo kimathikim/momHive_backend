@@ -9,6 +9,8 @@ from app.services.groups import (
     send_group_message,
     get_group_messages,
     my_groups,
+    get_user_profile,
+    update_user_profile,
     add_group_members,
 )
 from app.routes import group_bp
@@ -80,3 +82,17 @@ def send_message_to_group(group_id):
 @jwt_required()
 def fetch_group_messages(group_id):
     return get_group_messages(group_id)
+
+
+@group_bp.route("/update_profile", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    return update_user_profile(data, user_id)
+
+
+@group_bp.route("/profile", methods=["GET"])
+@jwt_required()
+def get_profile(user_id):
+    return get_user_profile(user_id)
