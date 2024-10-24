@@ -59,11 +59,13 @@ def my_groups(user_id):
     return jsonify(groupsList), 200
 
 
-def get_group_details(group_id):
-    group = storage.get(Groups, id=group_id)
-    if not group:
-        return {"error": "Group not found"}, 404
-    return jsonify(group.to_dict())
+def get_group_members(group_id):
+    members = GroupMembers.query.filter_by(group_id=group_id).all()
+    if not members:
+        return jsonify({"error": "Group not found or no members"}), 404
+    return jsonify(
+        [{"name": member.user.name, "email": member.user.email} for member in members]
+    ), 200
 
 
 def join_group(group_id, user_id):
@@ -78,6 +80,31 @@ def join_group(group_id, user_id):
     member = GroupMembers(group_id=group_id, user_id=user_id)
     member.save()
     return {"message": "Successfully joined the group"}
+
+
+def get_group_details(group_id):
+    group = storage.get(Groups, group_id)
+    if not group:
+        return {"error": "Group not found"}, 404
+
+    group_dict = group.to_dict()
+
+    members = storage.all(GroupMembers)
+    for member in members:
+        if member.group_id == group_id:
+            group_dict["members"] = len([member.to_dict() for member in group.members])
+
+    messages = GroupMessages.query.filter_by(group_id=group_id).all()
+    group_dict["messages"] = [
+        {
+            "user_id": message.user_id,
+            "content": message.content,
+            "timestamp": message.timestamp,
+        }
+        for message in messages
+    ]
+
+    return jsonify(group_dict), 200
 
 
 def leave_group(group_id, user_id):
