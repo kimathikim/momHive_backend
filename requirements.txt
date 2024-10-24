@@ -5,7 +5,6 @@ alembic==1.13.3
 amqp==5.2.0
 annotated-types==0.7.0
 anyio==3.5.0
-apispec==6.6.1
 apturl==0.5.2
 art==6.2
 async-timeout==4.0.3
