@@ -94,7 +94,7 @@ def get_group_details(group_id):
         if member.group_id == group_id:
             group_dict["members"] = len([member.to_dict() for member in group.members])
 
-    messages = GroupMessages.query.filter_by(group_id=group_id).all()
+    messages = storage.all(GroupMessages)
     group_dict["messages"] = [
         {
             "user_id": message.user_id,
