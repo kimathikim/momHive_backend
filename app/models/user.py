@@ -8,6 +8,7 @@ class Users(Base, BaseClass):
 
     first_name = Column(String(128), nullable=False)
     second_name = Column(String(128), nullable=False)
+    bio = Column(Text, nullable=True)
     email = Column(String(128), nullable=False, unique=True)
     phone_number = Column(String(128), nullable=False, unique=True)
     password = Column(String(128), nullable=False)

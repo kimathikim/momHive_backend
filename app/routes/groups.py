@@ -84,7 +84,7 @@ def fetch_group_messages(group_id):
     return get_group_messages(group_id)
 
 
-@group_bp.route("/update_profile", methods=["PATCH"])
+@group_bp.route("/update_profile", methods=["PUT"])
 @jwt_required()
 def update_profile():
     user_id = get_jwt_identity()
