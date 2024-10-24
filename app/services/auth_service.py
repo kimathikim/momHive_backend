@@ -2,6 +2,7 @@ from datetime import timedelta
 from flask.json import jsonify
 from app.utils.sanitization import sanitize_object
 from app.models import storage
+from flask_jwt_extended import get_jwt_identity, jwt_required, unset_jwt_cookies
 import bcrypt
 from flask_jwt_extended import create_access_token
 from app.models.user import Users
@@ -54,5 +55,14 @@ def login_user(data):
                 return jsonify({"access_token": access_token}), 201
             return jsonify({"error": "Invalid credentials"}), 402
         return jsonify({"error": "Email and password required"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def logout_user(data):
+    try:
+        response = jsonify({"msg": "Logout successful"})
+        unset_jwt_cookies(response)
+        return response, 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
