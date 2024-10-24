@@ -65,7 +65,7 @@ def get_group_members(group_id):
     if not members:
         return jsonify({"error": "Group not found or no members"}), 404
     return jsonify(
-        [{"name": member.user.name, "email": member.user.email} for member in members]
+        [{"name": member.name, "email": member.email} for member in members]
     ), 200
 
 
