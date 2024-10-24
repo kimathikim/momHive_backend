@@ -61,6 +61,7 @@ def my_groups(user_id):
 
 def get_group_members(group_id):
     members = storage.all(GroupMembers)
+    print(members)
     members = [member for member in members if member.group_id == group_id]
     if not members:
         return jsonify({"error": "Group not found or no members"}), 404
