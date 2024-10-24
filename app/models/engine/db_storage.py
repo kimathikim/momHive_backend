@@ -79,11 +79,14 @@ class DBStorage:
 
     def reload(self):
         """Create all tables in the database and
-        the current database session"""
+
+        the current database session, skipping existing ones."""
         from sqlalchemy.orm import scoped_session
         from app.models.base_model import Base
 
-        Base.metadata.create_all(self.__engine)
+        # Use create_all() to only create missing tables
+        Base.metadata.create_all(self.__engine)  # This skips existing tables
+
         session_factory = sessionmaker(
             bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
