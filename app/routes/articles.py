@@ -40,7 +40,7 @@ def get_all_articles():
 # Post a new article
 @articles_bp.route("/articles", methods=["POST"])
 @jwt_required()
-@rate_limit(limit=5, per=60)  # Limit to 5 articles per minute
+# @rate_limit(limit=5, per=60)  # Limit to 5 articles per minute
 def post_article():
     """Create a new article."""
     user_id = get_jwt_identity()
@@ -51,25 +51,22 @@ def post_article():
     if not data or not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
 
-    try:
         # Create and save new article
-        article = Article(
-            title=data["title"],
-            author=data["author"],
-            description=data.get("description", ""),
-            content=data["content"],
-            published_at=datetime.strptime(
-                data["published_at"], "%Y-%m-%dT%H:%M:%S"),
-            source=data.get("source", ""),
-            url=data.get("url", ""),
-            url_to_image=data.get("url_to_image", ""),
-            topic=data["topic"],  # Define the article's topic
-        )
-        article.save()
+    article = Article(
+        title=data["title"],
+        author=data["author"],
+        description=data.get("description", ""),
+        content=data["content"],
+        published_at=datetime.strptime(
+            data["published_at"], "%Y-%m-%dT%H:%M:%S"),
+        source=data.get("source", ""),
+        url=data.get("url", ""),
+        url_to_image=data.get("url_to_image", ""),
+        topic=data["topic"],  # Define the article's topic
+    )
+    article.save()
 
-        return jsonify({"message": "Article created successfully"}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify({"message": "Article created successfully"}), 201
 
 
 # Get a specific article by ID
