@@ -75,7 +75,7 @@ def send_message_to_group(group_id):
     return send_group_message(group_id, user_id, content)
 
 
-@group_bp.route("/groups/<group_id>/messages", methods=["GET"])
+@group_bp.route("/groups/<group_id>/mess", methods=["GET"])
 @jwt_required()
 def fetch_group_messages(group_id):
     return get_group_messages(group_id)
