@@ -136,6 +136,7 @@ def leave_group(group_id, user_id):
     if not member:
         return {"error": "Not a group member"}, 400
 
+    print(member)
     storage.delete(member[0])
     return {"message": "Successfully left the group"}
 
