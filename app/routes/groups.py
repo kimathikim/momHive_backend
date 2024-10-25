@@ -44,7 +44,7 @@ def group_details(group_id):
     return get_group_details(group_id)
 
 
-@group_bp.route("/groups/<group_id>/members", methods=["GET"])  # New route to get group members
+@group_bp.route("/groups/<group_id>/mem", methods=["GET"])  # New route to get group members
 @jwt_required()
 def get_group_members_route(group_id):
     return get_group_members(group_id)
