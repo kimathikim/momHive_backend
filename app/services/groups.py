@@ -62,13 +62,17 @@ def my_groups(user_id):
 def get_group_members(group_id):
     members = storage.all(GroupMembers)
     members = [member for member in members if member.group_id == group_id]
+    members_d = []
     for member in members:
-        members = storage.get(Users, id=member.user_id)
+        user = storage.get(Users, member.user_id)
+        if user:
+            members_d.append(user.to_dict())
+        else:
+            print(f"User with id {member.user_id} not found.")
 
-    print(members)
-    if not members:
-        return jsonify({"error": "Group not found or no ddmembers"}), 404
-    return jsonify(members), 200
+    if not members_d:
+        return jsonify({"error": "Group not found or no members"}), 404
+    return jsonify(members_d), 200
 
 
 def join_group(group_id, user_id):
