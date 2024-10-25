@@ -139,6 +139,7 @@ def leave_group(group_id, user_id):
     for mem in member:
         print(mem.to_dict())
     storage.delete(member[0])
+    storage.save()
     return {"message": "Successfully left the group"}
 
 
