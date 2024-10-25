@@ -45,6 +45,7 @@ def post_article():
     """Create a new article."""
     user_id = get_jwt_identity()
     data = request.json
+    print(data)
 
     # Validate required fields
     required_fields = ["title", "author", "content", "published_at", "topic"]
