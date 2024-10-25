@@ -15,9 +15,11 @@ def create_group(data):
     if not name or not created_by:
         return {"error": "Missing required fields"}
 
-    new_group = Groups(name=name, description=description, created_by=created_by)
+    new_group = Groups(name=name, description=description,
+                       created_by=created_by)
     new_group.save()
-    new_member = GroupMembers(group_id=new_group.id, user_id=created_by, is_admin=True)
+    new_member = GroupMembers(group_id=new_group.id,
+                              user_id=created_by, is_admin=True)
     new_member.save()
     print(new_group.to_dict())
     return {"message": "Group created successfully"}
@@ -35,7 +37,8 @@ def list_groups(query_params):
             return {"error": "No groups found"}, 404
         for group in groups:
             groupDict = group.to_dict()
-            groupDict["members"] = len([member.to_dict() for member in group.members])
+            groupDict["members"] = len([member.to_dict()
+                                       for member in group.members])
             print(groupDict)
             groupsList.append(groupDict)
     return jsonify(groupsList), 200
@@ -52,7 +55,8 @@ def my_groups(user_id):
         groupDict["members"] = [member.to_dict() for member in group.members]
 
         for member in groupDict["members"]:
-            groupDict["members"] = len([member.to_dict() for member in group.members])
+            groupDict["members"] = len([member.to_dict()
+                                       for member in group.members])
 
             if member["user_id"] == user_id:
                 groupsList.append(groupDict)
@@ -99,7 +103,8 @@ def get_group_details(group_id):
     members = storage.all(GroupMembers)
     for member in members:
         if member.group_id == group_id:
-            group_dict["members"] = len([member.to_dict() for member in group.members])
+            group_dict["members"] = len(
+                [member.to_dict() for member in group.members])
 
     messages = storage.all(GroupMessages)
     group_dict["messages"] = [
@@ -118,10 +123,20 @@ def leave_group(group_id, user_id):
     group = storage.get(Groups, group_id)
     if not group:
         return {"error": "Group not found"}, 404
-    member = group.memebers.filter_by(user_id=user_id).first()
+
+    members = storage.all(GroupMembers)
+    if members is None:
+        return {"error": "No members found"}, 404
+
+    member = [
+        member
+        for member in members
+        if member.group_id == group_id and member.user_id == user_id
+    ]
     if not member:
         return {"error": "Not a group member"}, 400
-    storage.delete(member)
+
+    storage.delete(member[0])
     return {"message": "Successfully left the group"}
 
 
@@ -140,7 +155,8 @@ def send_group_message(group_id, user_id, content):
     group = storage.get(Groups, group_id)
     if not group:
         return {"error": "Group not found"}, 404
-    message = GroupMessages(group_id=group_id, user_id=user_id, content=content)
+    message = GroupMessages(
+        group_id=group_id, user_id=user_id, content=content)
     message.save()
     return {"message": "Message sent to the group"}
 
