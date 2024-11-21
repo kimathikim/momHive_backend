@@ -120,4 +120,3 @@ def ws_send_group_message(data):
         print(f"Group message sent to room {room}")
     else:
         print(f"Unauthorized message by user {sender_id} to group {group_id}")
-
