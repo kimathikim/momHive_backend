@@ -91,7 +91,6 @@ def ws_send_private_message(data):
             recipient_id=receiver_id,
             content=content,
         )
-        message.save()
 
         message = message.to_dict()
         if message["timestamp"]:
