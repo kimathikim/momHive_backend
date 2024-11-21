@@ -125,8 +125,8 @@ def ws_send_private_message(data):
         print(f"Message sent successfully to private room: {room}")
 
         # Add the message to Redis for offline delivery
-        redis_client.rpush(
-            f"offline_messages:{receiver_id}", json.dumps(message_dict))
+        # redis_client.rpush(
+        #    f"offline_messages:{receiver_id}", json.dumps(message_dict))
 
 
 @socketio.on("send_group_message")
