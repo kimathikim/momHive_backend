@@ -1,6 +1,5 @@
 from app.factory import create_app
 from app.extensions import socketio
-from flask_socket import emit, join_room
 
 app = create_app()
 
