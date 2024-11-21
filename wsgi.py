@@ -1,5 +1,6 @@
 import datetime
 import json
+from uuid import uuid4
 
 from flask import request
 from flask_socketio import join_room
@@ -8,10 +9,27 @@ from app.extensions import redis_client, socketio
 from app.factory import create_app
 from app.models import storage
 from app.models.groups import Groups
-from app.models.messages import Messages
 from app.utils.date_time import format_datetime
 
 app = create_app()
+
+
+class Messages:
+    def __init__(self, id, sender_id, recipient_id, content, created_at):
+        self.id = id
+        self.sender_id = sender_id
+        self.recipient_id = recipient_id
+        self.content = content
+        self.created_at = created_at
+
+    def to_dict(self):
+        return {
+            "id": str(self.id),  # Convert UUID to string
+            "sender_id": self.sender_id,
+            "recipient_id": self.recipient_id,
+            "content": self.content,
+            "timestamp": self.created_at,
+        }
 
 
 @socketio.on("connect")
@@ -50,8 +68,9 @@ def join_private_room(data):
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
         join_room(room)
         # Notify the client that they joined the room successfully
-        socketio.emit("room_joined", {"status": "success",
-             "room": room}, room=request.sid)
+        socketio.emit(
+            "room_joined", {"status": "success", "room": room}, room=request.sid
+        )
         print(f"User {sender_id} joined private room {room}")
     else:
         # Notify the client of the failure
@@ -87,24 +106,27 @@ def ws_send_private_message(data):
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
 
         message = Messages(
+            id=uuid4(),
             sender_id=sender_id,
             recipient_id=receiver_id,
             content=content,
+            created_at=datetime.datetime.now(),  # Ensure created_at is set
         )
 
-        message = message.to_dict()
-        if message["timestamp"]:
-            message["timestamp"] = format_datetime(message["timestamp"])
+        message_dict = message.to_dict()
+        if message_dict["timestamp"]:
+            message_dict["timestamp"] = format_datetime(
+                message_dict["timestamp"])
         socketio.emit(
             "receive_private_message",
-            message,
+            message_dict,
             room=room,
         )
         print(f"Message sent successfully to private room: {room}")
 
         # Add the message to Redis for offline delivery
         redis_client.rpush(
-            f"offline_messages:{receiver_id}", json.dumps(message))
+            f"offline_messages:{receiver_id}", json.dumps(message_dict))
 
 
 @socketio.on("send_group_message")
