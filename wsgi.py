@@ -49,7 +49,7 @@ def join_private_room(data):
     if sender_id and receiver_id:
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
         join_room(room)
-        send_offline_messages(sender_id, room)
+        # send_offline_messages(sender_id, room)
         print(f"User {sender_id} joined private room {room}")
 
 
@@ -97,7 +97,7 @@ def ws_send_private_message(data):
         print(f"Message sent successfully to private room: {room}")
 
         # Add the message to Redis for offline delivery
-        redis_client.rpush(f"offline_messages:{receiver_id}", json.dumps(message))
+#        redis_client.rpush(f"offline_messages:{receiver_id}", json.dumps(message))
 
 
 @socketio.on("send_group_message")
