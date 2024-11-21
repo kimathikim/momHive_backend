@@ -1,13 +1,15 @@
-from app.models.groups import Groups
-from app.models import storage
-from app.extensions import redis_client, socketio
-from app.utils.date_time import format_datetime
-from flask_socketio import emit, join_room
-from flask import request
-from app.models.messages import Messages
-import json
 import datetime
+import json
+
+from flask import request
+from flask_socketio import join_room
+
+from app.extensions import redis_client, socketio
 from app.factory import create_app
+from app.models import storage
+from app.models.groups import Groups
+from app.models.messages import Messages
+from app.utils.date_time import format_datetime
 
 app = create_app()
 
@@ -18,7 +20,8 @@ def handle_connect():
 
 
 def send_offline_messages(user_id, room):
-    offline_messages = redis_client.lrange(f"offline_messages:{user_id}", 0, -1)
+    offline_messages = redis_client.lrange(
+        f"offline_messages:{user_id}", 0, -1)
     print(f"Offline messages: {offline_messages}")
 
     if offline_messages:
@@ -38,9 +41,6 @@ def handle_disconnect():
     print(f"Client disconnected: {request.sid}")
 
 
-# JOIN PRIVATE ROOM
-
-
 @socketio.on("join_private_room")
 def join_private_room(data):
     sender_id = data.get("sender_id")
@@ -49,13 +49,20 @@ def join_private_room(data):
     if sender_id and receiver_id:
         room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
         join_room(room)
-        # send_offline_messages(sender_id, room)
+        # Notify the client that they joined the room successfully
+        socketio.emit("room_joined", {"status": "success",
+             "room": room}, room=request.sid)
         print(f"User {sender_id} joined private room {room}")
+    else:
+        # Notify the client of the failure
+        socketio.emit(
+            "room_joined",
+            {"status": "error", "message": "Invalid sender or receiver ID"},
+            room=request.sid,
+        )
 
 
 # JOIN GROUP ROOM
-
-
 @socketio.on("join_group_room")
 def join_group_room(data):
     user_id = data.get("user_id")
@@ -97,7 +104,8 @@ def ws_send_private_message(data):
         print(f"Message sent successfully to private room: {room}")
 
         # Add the message to Redis for offline delivery
-#        redis_client.rpush(f"offline_messages:{receiver_id}", json.dumps(message))
+        redis_client.rpush(
+            f"offline_messages:{receiver_id}", json.dumps(message))
 
 
 @socketio.on("send_group_message")
