@@ -1,6 +1,6 @@
-from sqlalchemy.pool import QueuePool
-from sqlalchemy import create_engine
 from app.utils.date_time import format_datetime
+import eventlet
+eventlet.monkey_patch()
 from app.models.groups import Groups
 from app.models import storage
 from app.factory import create_app
@@ -10,17 +10,13 @@ from flask import request
 from uuid import uuid4
 import json
 import datetime
-import eventlet
 
-eventlet.monkey_patch()
 
 
 app = create_app()
 
 # Configure SQLAlchemy to use QueuePool
 
-DATABASE_URI = "your_database_uri_here"
-engine = create_engine(DATABASE_URI, poolclass=QueuePool)
 
 with app.app_context():
 
