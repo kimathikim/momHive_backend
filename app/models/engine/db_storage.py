@@ -2,6 +2,7 @@
 """DBStorage class for the Hospital prescription management system"""
 
 import os
+from sqlalchemy import QueuePool
 from sqlalchemy.orm import sessionmaker
 from app.models.messages import Messages
 from app.models.mentorship import Mentorship
@@ -33,6 +34,7 @@ class DBStorage:
                 os.getenv("MH_MYSQL_DB"),
             ),
             pool_pre_ping=True,
+            poolclass=QueuePool,
         )
         if os.getenv("MH_ENV") == "test":
             Base.metadata.drop_all(self.__engine)
@@ -87,8 +89,7 @@ class DBStorage:
         # Use create_all() to only create missing tables
         Base.metadata.create_all(self.__engine)  # This skips existing tables
 
-        session_factory = sessionmaker(
-            bind=self.__engine, expire_on_commit=False)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
 
