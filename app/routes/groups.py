@@ -1,6 +1,8 @@
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.services.groups import ( create_group, list_groups,
+from app.services.groups import (
+    create_group,
+    list_groups,
     get_group_details,
     get_group_members,  # Import the new service for fetching group members
     join_group,
@@ -44,7 +46,8 @@ def group_details(group_id):
     return get_group_details(group_id)
 
 
-@group_bp.route("/groups/<group_id>/mem", methods=["GET"])  # New route to get group members
+# New route to get group members
+@group_bp.route("/groups/<group_id>/mem", methods=["GET"])
 @jwt_required()
 def get_group_members_route(group_id):
     return get_group_members(group_id)
@@ -94,4 +97,3 @@ def update_profile():
 def get_profile():
     user_id = get_jwt_identity()
     return get_user_profile(user_id)
-

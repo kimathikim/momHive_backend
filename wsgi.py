@@ -1,15 +1,17 @@
-import datetime
-import json
-from uuid import uuid4
-
-from flask import request
-from flask_socketio import join_room
-
-from app.extensions import redis_client, socketio
-from app.factory import create_app
-from app.models import storage
-from app.models.groups import Groups
 from app.utils.date_time import format_datetime
+from app.models.groups import Groups
+from app.models import storage
+from app.factory import create_app
+from app.extensions import redis_client, socketio
+from flask_socketio import join_room
+from flask import request
+from uuid import uuid4
+import json
+import datetime
+import eventlet
+
+eventlet.monkey_patch()
+
 
 app = create_app()
 
@@ -38,8 +40,7 @@ def handle_connect():
 
 
 def send_offline_messages(user_id, room):
-    offline_messages = redis_client.lrange(
-        f"offline_messages:{user_id}", 0, -1)
+    offline_messages = redis_client.lrange(f"offline_messages:{user_id}", 0, -1)
     print(f"Offline messages: {offline_messages}")
 
     if offline_messages:
@@ -77,11 +78,13 @@ def join_private_room(data):
         socketio.emit(
             "room_joined",
             {"status": "error", "message": "Invalid sender or receiver ID"},
-            room=request.sid,
+            room=room,
         )
 
 
 # JOIN GROUP ROOM
+
+
 @socketio.on("join_group_room")
 def join_group_room(data):
     user_id = data.get("user_id")
@@ -115,18 +118,12 @@ def ws_send_private_message(data):
 
         message_dict = message.to_dict()
         if message_dict["timestamp"]:
-            message_dict["timestamp"] = format_datetime(
-                message_dict["timestamp"])
-        socketio.emit(
-            "receive_private_message",
-            message_dict,
-            room=room,
-        )
+            message_dict["timestamp"] = format_datetime(message_dict["timestamp"])
+        socketio.emit("receive_private_message", message_dict, room=room)
         print(f"Message sent successfully to private room: {room}")
 
         # Add the message to Redis for offline delivery
-        # redis_client.rpush(
-        #    f"offline_messages:{receiver_id}", json.dumps(message_dict))
+        # redis_client.rpush(f"offline_messages:{receiver_id}", json.dumps(message_dict))
 
 
 @socketio.on("send_group_message")
