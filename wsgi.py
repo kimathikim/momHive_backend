@@ -1,29 +1,29 @@
+from sqlalchemy.pool import QueuePool
+from sqlalchemy import create_engine
+from app.utils.date_time import format_datetime
+from app.models.groups import Groups
+from app.models import storage
+from app.factory import create_app
+from app.extensions import redis_client, socketio
+from flask_socketio import join_room
+from flask import request
+from uuid import uuid4
+import json
+import datetime
 import eventlet
+
 eventlet.monkey_patch()
 
-import datetime
-import json
-from uuid import uuid4
-
-from flask import request
-from flask_socketio import join_room
-
-from app.extensions import redis_client, socketio
-from app.factory import create_app
-from app.models import storage
-from app.models.groups import Groups
-from app.utils.date_time import format_datetime
 
 app = create_app()
 
 # Configure SQLAlchemy to use QueuePool
-from sqlalchemy import create_engine
-from sqlalchemy.pool import QueuePool
 
-DATABASE_URI = 'your_database_uri_here'
+DATABASE_URI = "your_database_uri_here"
 engine = create_engine(DATABASE_URI, poolclass=QueuePool)
 
 with app.app_context():
+
     class Messages:
         def __init__(self, id, sender_id, recipient_id, content, created_at):
             self.id = id
@@ -70,14 +70,22 @@ with app.app_context():
         receiver_id = data.get("receiver_id")
 
         if sender_id and receiver_id:
-            room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
+            room = (
+                f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
+            )
             join_room(room)
             # Notify the client that they joined the room successfully
-            socketio.emit("room_joined", {"status": "success", "room": room}, room=request.sid)
+            socketio.emit(
+                "room_joined", {"status": "success", "room": room}, room=request.sid
+            )
             print(f"User {sender_id} joined private room {room}")
         else:
             # Notify the client of the failure
-            socketio.emit("room_joined", {"status": "error", "message": "Invalid sender or receiver ID"}, room=request.sid)
+            socketio.emit(
+                "room_joined",
+                {"status": "error", "message": "Invalid sender or receiver ID"},
+                room=request.sid,
+            )
 
     # JOIN GROUP ROOM
     @socketio.on("join_group_room")
@@ -100,7 +108,9 @@ with app.app_context():
         content = data.get("content")
 
         if sender_id and receiver_id and content:
-            room = f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
+            room = (
+                f"private_{min(sender_id, receiver_id)}_{max(sender_id, receiver_id)}"
+            )
 
             message = Messages(
                 id=uuid4(),
@@ -142,5 +152,6 @@ with app.app_context():
             print(f"Group message sent to room {room}")
         else:
             print(f"Unauthorized message by user {sender_id} to group {group_id}")
+
 
 application = app
