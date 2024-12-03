@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python6
 """DBStorage class for the Hospital prescription management system"""
 
 import os
@@ -16,6 +16,7 @@ from app.models.events import Events
 from app.models.event_attendees import EventAttendees
 from app.models.groupMessages import GroupMessages
 import pymysql
+from dotenv import load_dotenv
 
 
 class DBStorage:
@@ -25,6 +26,9 @@ class DBStorage:
         """Initializes the DBStorage instance"""
         from sqlalchemy import create_engine
         from app.models.base_model import Base
+
+        # Load environment variables from .env file
+        load_dotenv()
 
         self.__engine = create_engine(
             "mysql+pymysql://{}:{}@{}/{}".format(
@@ -81,7 +85,6 @@ class DBStorage:
 
     def reload(self):
         """Create all tables in the database and
-
         the current database session, skipping existing ones."""
         from sqlalchemy.orm import scoped_session
         from app.models.base_model import Base
