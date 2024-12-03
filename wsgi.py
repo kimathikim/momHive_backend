@@ -35,6 +35,13 @@ class Messages:
 @socketio.on("connect")
 def handle_connect():
     print(f"Client connected: {request.sid}")
+    return {"status": "connected"}
+
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    print(f"Client disconnected: {request.sid}")
+    return {"status": "disconnected"}
 
 
 def send_offline_messages(user_id, room):
@@ -51,11 +58,6 @@ def send_offline_messages(user_id, room):
             except TypeError as e:
                 print(f"Error converting message to JSON: {str(e)}")
         redis_client.delete(f"offline_messages:{user_id}")
-
-
-@socketio.on("disconnect")
-def handle_disconnect():
-    print(f"Client disconnected: {request.sid}")
 
 
 @socketio.on("join_private_room")
