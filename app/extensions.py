@@ -54,7 +54,9 @@ def init_extensions(app):
         app,
         ping_interval=25,
         ping_timeout=120,
-        async_mode="eventlet",
+        async_mode='gevent',
+        logger=True,
+        engineio_logger=True,
         cors_allowed_origins="*",
     )
     swagger.init_app(app)
