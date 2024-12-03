@@ -27,7 +27,7 @@ class DBStorage:
         from sqlalchemy import create_engine
         from app.models.base_model import Base
 
-        # Load environment variables from .env file
+        # Load environment variables from .env fil aae
         load_dotenv()
 
         self.__engine = create_engine(
