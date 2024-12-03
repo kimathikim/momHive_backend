@@ -1,6 +1,8 @@
+from eventlet import monkey_patch
+
+monkey_patch()
+
 from app.utils.date_time import format_datetime
-import eventlet
-eventlet.monkey_patch()
 from app.models.groups import Groups
 from app.models import storage
 from app.factory import create_app
@@ -10,8 +12,6 @@ from flask import request
 from uuid import uuid4
 import json
 import datetime
-
-
 
 app = create_app()
 
